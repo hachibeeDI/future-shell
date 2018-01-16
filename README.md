@@ -14,10 +14,7 @@ However API complicated hard to understand.  This is to make it easy and simple.
 ...     sleep,
 ...     gather,
 ... )
->>> from futures_shell import (
-...     futurify,
-...     unwrap,
-... )
+>>> from futures_shell import futurify
 
 >>> @futurify
 ... async def slow_operation(x, y):
@@ -49,7 +46,7 @@ calclating...
 >>> print(result1.result(), result1a.result())
 22 33
 
->>> result_a = unwrap(loop, slow_operation(1, 2))
+>>> result_a = loop.run_until_complete(slow_operation(1, 2))
 calclating...
 >>> print('an unwraped: ', result_a)
 an unwraped: 3
@@ -60,12 +57,13 @@ an unwraped: 3
 >>> result_1 = normal_operation(10, 2)
 >>> print(
 ...     'multiple unwraped',
-...     unwrap(
-...         loop,
-...         result_x,
-...         result_y,
-...         result_z,
-...         result_1,
+...     loop.run_until_complete(
+...         gather(
+...           result_x,
+...           result_y,
+...           result_z,
+...           result_1,
+...         )
 ...     ),
 ... )
 calclating...
@@ -80,6 +78,17 @@ multiple unwraped [3, 4, 5, 12]
 21
 >>> print(result2.result())
 21
+
+
+>>> @futurify
+... async def slow_txt_return(txt):
+...     await sleep(2)
+...     return f'{txt} is Done!'
+
+
+>>> txt_result = loop.run_until_complete(slow_txt_return('Future'))
+>>> print(txt_result)
+Future is Done!
 
 >>> loop.close()
 
